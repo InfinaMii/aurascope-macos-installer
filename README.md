@@ -1,6 +1,7 @@
 # aurascope-macos-installer
 Aurascope Demo install script for MacOS
 <br><br>
+<img src="https://github.com/InfinaMii/aurascope-macos-installer/blob/main/image.png?raw=true" />
 
 # Instructions:
 
