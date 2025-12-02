@@ -1,0 +1,86 @@
+#!/bin/sh
+
+# Create temp download directory
+mkdir ./aurascope_temp
+cd ./aurascope_temp
+
+# Create location for files to transplant
+mkdir ./transplant
+
+# Create SteamCMD temp install directory
+mkdir ./steamcmd
+cd ./steamcmd
+
+# Download SteamCMD
+curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_osx.tar.gz" | tar zxvf -
+
+# Get login information (required to download from Steam)
+username=$(osascript -e 'display dialog "Enter your Steam username (will only be used for SteamCMD and then forgotten)" default answer "" hidden answer false with title "SteamCMD Login" buttons {"Cancel", "Submit"} default button "Submit"' -e 'text returned of result')
+
+echo $username
+
+if [ "" = "$username" ]; then
+    exit
+fi
+
+password=$(osascript -e 'display dialog "Enter your Steam password (will only be used for SteamCMD and then forgotten)" default answer "" hidden answer true with title "SteamCMD Login" buttons {"Cancel", "Submit"} default button "Submit"' -e 'text returned of result')
+
+
+if [ "" = "$password" ]; then
+    exit
+fi
+
+# Warn user about Steam Guard
+osascript -e 'display dialog "If you have Steam Guard enabled, you will recieve a notification in your Steam Mobile app shortly." with title "SteamCMD" buttons {"Cancel", "OK"} default button "OK"'
+
+# Download the Aurascope Demo depot from Steam
+./steamcmd.sh +login $username $password +download_depot 3188440 3188441 +exit
+
+# Extract required game files
+mv ./steamapps/content/app_3188440/depot_3188441/data.win ../transplant/game.ios
+mv ./steamapps/content/app_3188440/depot_3188441/audio/ ../transplant/audio/
+
+# Exit directory and delete
+cd ..
+rm -r steamcmd
+
+# Download SURVEY_PROGRAM (Deltarune Chapter 1)
+curl -OL https://archive.org/download/SURVEY_PROGRAM/English/SURVEY_PROGRAM_MACOSX_ENGLISH.dmg
+
+# Mount SURVEY_PROGRAM image
+hdiutil attach ./SURVEY_PROGRAM_MACOSX_ENGLISH.dmg
+
+# Extract app bundle from image
+mv /Volumes/SURVEY_PROGRAM/SURVEY_PROGRAM.app/ ./SURVEY_PROGRAM.app/
+
+# Unmount image and delete
+hdiutil detach /Volumes/SURVEY_PROGRAM
+rm ./SURVEY_PROGRAM_MACOSX_ENGLISH.dmg
+
+# Move transplant files into app bundle
+mv -f ./transplant/game.ios ./SURVEY_PROGRAM.app/Contents/Resources/game.ios
+mv -f ./transplant/audio/ ./SURVEY_PROGRAM.app/Contents/Resources/audio/
+
+# Rename app bundle to "Aurascope" - BREAKS: INVESTIGATE
+#plutil -replace CFBundleDisplayName -string "Aurascope Demo" ./SURVEY_PROGRAM.app/Contents/Info.plist
+
+# Download new icon and add it to app bundle
+curl -OL https://github.com/InfinaMii/aurascope-macos-installer/raw/refs/heads/main/icon.icns
+mv -f icon.icns ./SURVEY_PROGRAM.app/Contents/Resources/icon.icns
+
+# Move Aurascope to app directory
+mv ./SURVEY_PROGRAM.app/ /Applications/Aurascope\ Demo.app/
+
+# Exit directory and delete
+cd ..
+rm -fr ./aurascope_temp
+
+# Success message
+rungame=$(osascript -e 'display dialog "Installed Aurascope Demo successfully! Would you like to open it?" with title "Yippee!" buttons {"No Thanks", "Yes"} default button "Yes"')
+
+if [ "" = "$rungame" ]; then
+    exit
+fi
+
+# Run Aurascope if the answer was Yes
+open /Applications/Aurascope\ Demo.app
