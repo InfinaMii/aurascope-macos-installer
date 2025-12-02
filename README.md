@@ -19,5 +19,5 @@ The script (provided in this repo) does the following:
 - Signs into SteamCMD with your account information (required to download Aurascope)
 - Downloads the Aurascope Demo and extracts the required data.win and audio files
 - Downloads the Deltarune [SURVEY_PROGRAM](https://archive.org/details/SURVEY_PROGRAM) app bundle (Chapter 1)
-- Transplants the Aurascope data.win and audio files over the Deltarune ones (and changes the app icon to the one provided here)
+- Transplants the Aurascope data.win and audio files over the Deltarune ones (and changes the app icon to the one above)
 - Moves the newly-created Aurascope into the Applications folder so that it appears in Spotlight/Launchpad
