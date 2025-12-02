@@ -76,11 +76,12 @@ cd ..
 rm -fr ./aurascope_temp
 
 # Success message
-rungame=$(osascript -e 'display dialog "Installed Aurascope Demo successfully! Would you like to open it?" with title "Yippee!" buttons {"No Thanks", "Yes"} default button "Yes"')
+rungame=$(osascript -e 'display dialog "Installed Aurascope Demo successfully! Would you like to open it?" with title "Yippee!" buttons {"No Thanks", "Yes"} default button "Yes"'  -e 'result is "Yes"')
 
-if [ "" = "$rungame" ]; then
+if [ false = "$rungame" ]; then
     exit
 fi
 
 # Run Aurascope if the answer was Yes
 open /Applications/Aurascope\ Demo.app
+
