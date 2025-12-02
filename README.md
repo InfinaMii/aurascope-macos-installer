@@ -9,6 +9,8 @@ Aurascope Demo install script for MacOS
 
 - Run the following command in Terminal:
   <br>`curl -sL https://github.com/InfinaMii/aurascope-macos-installer/raw/refs/heads/main/install_aurascope.sh | bash`
+
+- Follow the on-screen instructions
   <br><br>
 
 # Explanation:
