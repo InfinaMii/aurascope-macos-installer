@@ -61,8 +61,16 @@ rm ./SURVEY_PROGRAM_MACOSX_ENGLISH.dmg
 mv -f ./transplant/game.ios ./SURVEY_PROGRAM.app/Contents/Resources/game.ios
 mv -f ./transplant/audio/ ./SURVEY_PROGRAM.app/Contents/Resources/audio/
 
-# Rename app bundle to "Aurascope" - BREAKS: INVESTIGATE
-#plutil -replace CFBundleDisplayName -string "Aurascope Demo" ./SURVEY_PROGRAM.app/Contents/Info.plist
+# Remove unnecessary Deltarune files
+rm -r ./SURVEY_PROGRAM.app/Contents/Resources/mus/
+rm -r ./SURVEY_PROGRAM.app/Contents/Resources/lang/
+rm ./SURVEY_PROGRAM.app/Contents/Resources/snd_*
+rm ./SURVEY_PROGRAM.app/Contents/Resources/audio_intronoise.ogg
+
+# Rename app name to "Aurascope Demo"
+sed '2s/.*/DisplayName="Aurascope Demo"/' ./SURVEY_PROGRAM.app/Contents/Resources/options.ini > ./SURVEY_PROGRAM.app/Contents/Resources/options_2.ini
+
+mv -f ./SURVEY_PROGRAM.app/Contents/Resources/options_2.ini ./SURVEY_PROGRAM.app/Contents/Resources/options.ini
 
 # Download new icon and add it to app bundle
 curl -OL https://github.com/InfinaMii/aurascope-macos-installer/raw/refs/heads/main/icon.icns
@@ -76,12 +84,9 @@ cd ..
 rm -fr ./aurascope_temp
 
 # Success message
-rungame=$(osascript -e 'display dialog "Installed Aurascope Demo successfully! Would you like to open it?" with title "Yippee!" buttons {"No Thanks", "Yes"} default button "Yes"'  -e 'result is "Yes"')
+rungame=$(osascript -e 'display dialog "Installed Aurascope Demo successfully! Would you like to open it?" with title "Yippee!" buttons {"No Thanks", "Yes"} default button "Yes"')
 
-if [ false = "$rungame" ]; then
-    exit
+if [ "button returned:Yes" = "$rungame" ]; then
+    open /Applications/Aurascope\ Demo.app
 fi
-
-# Run Aurascope if the answer was Yes
-open /Applications/Aurascope\ Demo.app
 
