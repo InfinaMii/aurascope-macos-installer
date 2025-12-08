@@ -81,6 +81,11 @@ curl -OL https://github.com/InfinaMii/aurascope-macos-installer/raw/refs/heads/m
 mv -f Assets.car ./SURVEY_PROGRAM.app/Contents/Resources/Assets.car
 plutil -insert CFBundleIconName -string "auraq" ./SURVEY_PROGRAM.app/Contents/Info.plist
 
+# Set additional app info
+plutil -replace NSHumanReadableCopyright -string "(c) 2019-2025 Nick Oztok" ./SURVEY_PROGRAM.app/Contents/Info.plist
+plutil -replace CFBundleVersion -string "0.3.2" ./SURVEY_PROGRAM.app/Contents/Info.plist
+plutil -replace CFBundleShortVersionString -string "0.3.2" ./SURVEY_PROGRAM.app/Contents/Info.plist
+
 # Re-sign app bundle so that it launches now that the plist file has been modified
 codesign --force --deep --sign - ./SURVEY_PROGRAM.app
 
