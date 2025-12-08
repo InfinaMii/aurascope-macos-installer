@@ -76,6 +76,14 @@ mv -f ./SURVEY_PROGRAM.app/Contents/Resources/options_2.ini ./SURVEY_PROGRAM.app
 curl -OL https://github.com/InfinaMii/aurascope-macos-installer/raw/refs/heads/main/icon.icns
 mv -f icon.icns ./SURVEY_PROGRAM.app/Contents/Resources/icon.icns
 
+# Download dynamic (Tahoe) icon assets and update plist to support it
+curl -OL https://github.com/InfinaMii/aurascope-macos-installer/raw/refs/heads/main/Assets.car
+mv -f Assets.car ./SURVEY_PROGRAM.app/Contents/Resources/Assets.car
+plutil -insert CFBundleIconName -string "auraq" ./SURVEY_PROGRAM.app/Contents/Info.plist
+
+# Re-sign app bundle so that it launches now that the plist file has been modified
+codesign --force --deep --sign - ./SURVEY_PROGRAM.app
+
 # Move Aurascope to app directory
 mv ./SURVEY_PROGRAM.app/ /Applications/Aurascope\ Demo.app/
 
