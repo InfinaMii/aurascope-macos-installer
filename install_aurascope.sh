@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# Remove temp directory if it exists (failed previous install)
+if [ -d "./aurascope_temp" ]; then
+    rm -r ./aurascope_temp
+fi
+
 # Create temp download directory
 mkdir ./aurascope_temp
 cd ./aurascope_temp
@@ -14,24 +19,33 @@ cd ./steamcmd
 # Download SteamCMD
 curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_osx.tar.gz" | tar zxvf -
 
+
 # Get login information (required to download from Steam)
-username=$(osascript -e 'display dialog "Enter your Steam username (will only be used for SteamCMD and then forgotten)" default answer "" hidden answer false with title "SteamCMD Login" buttons {"Cancel", "Submit"} default button "Submit"' -e 'text returned of result')
+if [ -z ${username+x} ]; then
+    username=$(osascript -e 'display dialog "Enter your Steam username (will only be used for SteamCMD and then forgotten)" default answer "" hidden answer false with title "SteamCMD Login" buttons {"Cancel", "Submit"} default button "Submit"' -e 'text returned of result')
 
-echo $username
+    echo $username
 
-if [ "" = "$username" ]; then
-    exit
+    if [ "" = "$username" ]; then
+        echo "No username provided"
+        exit
+    fi
 fi
 
-password=$(osascript -e 'display dialog "Enter your Steam password (will only be used for SteamCMD and then forgotten)" default answer "" hidden answer true with title "SteamCMD Login" buttons {"Cancel", "Submit"} default button "Submit"' -e 'text returned of result')
+if [ -z ${password+x} ]; then
+    password=$(osascript -e 'display dialog "Enter your Steam password (will only be used for SteamCMD and then forgotten)" default answer "" hidden answer true with title "SteamCMD Login" buttons {"Cancel", "Submit"} default button "Submit"' -e 'text returned of result')
 
 
-if [ "" = "$password" ]; then
-    exit
+    if [ "" = "$password" ]; then
+        echo "No password provided"
+        exit
+    fi
 fi
 
-# Warn user about Steam Guard
-osascript -e 'display dialog "If you have Steam Guard enabled, you will recieve a notification in your Steam Mobile app shortly." with title "SteamCMD" buttons {"Cancel", "OK"} default button "OK"'
+# Warn user about Steam Guard (if warning isn't disabled)
+if [ "1" != "$skip_guard_warning" ]; then
+    osascript -e 'display dialog "If you have Steam Guard enabled, you will recieve a notification in your Steam Mobile app shortly." with title "SteamCMD" buttons {"OK"} default button "OK"'
+fi
 
 # Download the Aurascope Demo depot from Steam
 ./steamcmd.sh +login $username $password +download_depot 3188440 3188441 +exit
@@ -96,10 +110,18 @@ mv ./SURVEY_PROGRAM.app/ /Applications/Aurascope\ Demo.app/
 cd ..
 rm -fr ./aurascope_temp
 
-# Success message
-rungame=$(osascript -e 'display dialog "Installed Aurascope Demo successfully! Would you like to open it?" with title "Yippee!" buttons {"No Thanks", "Yes"} default button "Yes"')
+if [ -d "/Applications/Aurascope Demo.app/" ]; then
 
-if [ "button returned:Yes" = "$rungame" ]; then
-    open /Applications/Aurascope\ Demo.app
+
+    # Success message
+    rungame=$(osascript -e 'display dialog "Installed Aurascope Demo successfully! Would you like to open it?" with title "Yippee!" buttons {"No Thanks", "Yes"} default button "Yes"')
+
+    if [ "button returned:Yes" = "$rungame" ]; then
+        open /Applications/Aurascope\ Demo.app
+    fi
+    
+else
+    # Failure message
+    rungame=$(osascript -e 'display dialog "Failed to install Aurascope Demo." with title "Aw man..." buttons {"OK"} default button "OK"')
 fi
 
